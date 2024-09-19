@@ -26,17 +26,65 @@
         //Expose the app to the document
         window.app = app;
 
-        //Our very first button
-        let button = new PIXI.Graphics();
-        button.beginFill(0x3EB489)
-        button.drawRect(0, 0, 120, 70);
-        button.endFill();
+        /*
+                //Our very first button
+                let button = new PIXI.Graphics();
+                button.beginFill(0x3EB489)
+                button.drawRect(0, 0, 120, 70);
+                button.endFill();
+        
+                button.interactive = true;
+        
+                button.on("pointerover", (event) => {
+                    console.log("Pointer", event.client.x, event.client.y);
+                });
+        */
 
-        button.interactive = true;
+        //Make a button right
+        class Button extends PIXI.Container {
 
-        button.on()
+            // Constructor
+            constructor(text, w, h) {
+                super();
 
-        app.stage.addChild(button);
+
+                //Set defaults
+                if (text == undefined) text = "Button";
+                if (w == undefined) w = 100;
+                if (h == undefined) h =50 ;
+
+
+                // Button body
+                let body = new PIXI.Graphics();
+                body.beginFill(0x3EB489);
+                body.drawRect(0, 0, w, h);
+                body.endFill();
+
+                this.addChild(body);
+                this.body = body;
+
+                //Button label
+                let label = new PIXI.Text(text);
+                label.anchor.set(.5);
+                label.x = body.width / 2;
+                label.y = body.height / 2;
+
+                this.addChild(label);
+
+            }
+
+        } //END button
+
+        let ourButton = new Button("label", 120, 70);
+        ourButton.x = 120;
+        ourButton.y = 70;
+        app.stage.addChild(ourButton);
+
+
+        let ourButton2 = new Button("Other Button", 200);
+        ourButton2.x = 300;
+        ourButton2.y = 50;
+        app.stage.addChild(ourButton2);
 
     </script>
 
