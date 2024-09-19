@@ -1,93 +1,121 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All the Fishes</title>
     <script src="https://pixijs.download/release/pixi.js"></script>
 </head>
-
 <body>
 
-    <script type="module">
+<script type="module">
 
-        //The App
-        const app = new PIXI.Application();
-        await app.init({
-            width: 640,
-            height: 480,
-            backgroundColor: 0x000000
+    //The App
+    const app = new PIXI.Application();
+    await app.init({
+        width:640,
+        height:480,
+        backgroundColor: 0x000000
+    });
+
+    //Add view to the body
+    document.body.appendChild(app.canvas);
+
+    //Expose the app to the document
+    window.app = app;
+
+    //Our very first button
+    /*
+    let button = new PIXI.Graphics();
+        button.beginFill(0x3EB489);
+        button.drawRect(200,200,100,50);
+        button.endFill();
+
+        button.interactive = true;
+
+        button.on("pointermove", (event) => {
+            console.log("Pointer", event.client.x, event.client.y);
         });
 
-        //Add view to the body
-        document.body.appendChild(app.canvas);
+    app.stage.addChild(button);
+    */
 
-        //Expose the app to the document
-        window.app = app;
+    //Make a button right
+    class Button extends PIXI.Container {
 
-        /*
-                //Our very first button
-                let button = new PIXI.Graphics();
-                button.beginFill(0x3EB489)
-                button.drawRect(0, 0, 120, 70);
-                button.endFill();
-        
-                button.interactive = true;
-        
-                button.on("pointerover", (event) => {
-                    console.log("Pointer", event.client.x, event.client.y);
-                });
-        */
+        //Constructor
+        constructor(text,w,h) {
+            super();
 
-        //Make a button right
-        class Button extends PIXI.Container {
+            //Set defaults
+            if (text == undefined) text = "Button";
+            if (w == undefined) w = 100;
+            if (h == undefined) h = 50;
 
-            // Constructor
-            constructor(text, w, h) {
-                super();
+            //Button body
+            let body = new PIXI.Graphics();
+            body.beginFill(0x3EB489);
+            body.drawRect(0,0,
+                          w,h);
+            body.endFill();
 
+            this.addChild(body);
+            this.body = body;
 
-                //Set defaults
-                if (text == undefined) text = "Button";
-                if (w == undefined) w = 100;
-                if (h == undefined) h =50 ;
-
-
-                // Button body
-                let body = new PIXI.Graphics();
-                body.beginFill(0x3EB489);
-                body.drawRect(0, 0, w, h);
-                body.endFill();
-
-                this.addChild(body);
-                this.body = body;
-
-                //Button label
-                let label = new PIXI.Text(text);
+            //Button label
+            let label = new PIXI.Text(text);
                 label.anchor.set(.5);
-                label.x = body.width / 2;
-                label.y = body.height / 2;
+                label.x = body.width/2;
+                label.y = body.height/2;
+            
+            this.addChild(label);
 
-                this.addChild(label);
+            //Make it interactive
+            this.interactive = true;
 
-            }
+        }
 
-        } //END button
+    } //END Button
 
-        let ourButton = new Button("label", 120, 70);
-        ourButton.x = 120;
-        ourButton.y = 70;
-        app.stage.addChild(ourButton);
+    let ourButton = new Button("Label",100,50);
+        ourButton.x = 100;
+        ourButton.y = 50;
+        ourButton.on('pointerover', () => { //over
+            ourButton.alpha = .5;
+        });
+        ourButton.on('pointerout', () => { //out
+            ourButton.alpha = 1;
+        });
+        ourButton.on('pointerdown', () => { //down
+            ourButton.body.tint = 0xFF0000;
+        });
+        ourButton.on('pointerup', () => { //up
+            ourButton.body.tint = 0xFFFFFF;
+        });
+        ourButton.on('pointerupoutside', () => { //upoutside
+            ourButton.body.tint = 0xFFFFFF;
+        });
+    app.stage.addChild(ourButton);
 
-
-        let ourButton2 = new Button("Other Button", 200);
+    //Make this button draggable
+    let ourButton2 = new Button("Other Button",200);
         ourButton2.x = 300;
         ourButton2.y = 50;
-        app.stage.addChild(ourButton2);
+    app.stage.addChild(ourButton2);
 
-    </script>
+    let buttonDragged = false;
+        ourButton2.on('pointerdown', () => { buttonDragged = true; });
+        ourButton2.on('pointerup', () => { buttonDragged = false; });
+        ourButton2.on('pointermove', (event) => {
+            if (buttonDragged == false) return;
+            ourButton2.x = event.global.x - ourButton.body.width/2;
+            ourButton2.y = event.global.y - ourButton.body.height/2;
+            console.log(event);
+        });
 
+</script>
+    
 </body>
-
 </html>
