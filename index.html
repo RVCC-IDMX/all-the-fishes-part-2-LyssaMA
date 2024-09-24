@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,6 +86,267 @@
     loop();
 
 </script>
-    
 </body>
+</html>
+-->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquarium Scene</title>
+    <script src="http://pixijs.download/release/pixi.js"></script>
+</head>
+
+<body>
+    <script type="module">
+
+        // The App
+        const app = new PIXI.Application();
+        await app.init({
+            width: 800,
+            height: 600,
+            backgroundColor: 0x87CEEB // Light blue for water
+        });
+
+        // Add view to the body
+        document.body.appendChild(app.canvas);
+        window.app = app;
+
+        // Load assets
+        const assetUrls = [
+            "img/image-from-rawpixel-id-6203948-png.png", // Fish 1
+            "img/Blue and Yellow Fish.png",              // Fish 2
+            "img/Brown and Green Fish.png",              // Fish 3
+            "img/Orange-ish Fish.png",                   // Fish 4
+            "img/Plant.png",
+            "img/bubbles.png",
+            "img/Red Fish.png"                           // Fish 5
+        ];
+
+        await Promise.all(assetUrls.map(url => PIXI.Assets.load(url)));
+
+        // Add our first fish sprite
+        let fish1 = PIXI.Sprite.from(assetUrls[0]);
+        fish1.scale.set(0.15);
+        fish1.scale.x = -0.1;
+        fish1.anchor.set(0.2, 0.4);
+        fish1.x = 440;
+        fish1.y = 275;
+
+        // Add our second fish sprite
+        let fish2 = PIXI.Sprite.from(assetUrls[1]); // Second fish 
+        fish2.scale.set(0.2);
+        fish2.anchor.set(0.5);
+        fish2.x = 150;
+        fish2.y = 200;
+
+        // Add our third fish sprite
+        let fish3 = PIXI.Sprite.from(assetUrls[2]); // Third fish 
+        fish3.scale.set(0.135);
+        fish3.anchor.set(0.38);
+        fish3.x = 575;
+        fish3.y = 525;
+
+        // Add our fourth fish sprite
+        let fish4 = PIXI.Sprite.from(assetUrls[3]); // Fourth fish 
+        fish4.scale.set(0.2);
+        fish4.anchor.set(0.4);
+        fish4.x = 400;
+        fish4.y = 350;
+
+        // Add our fifth fish sprite
+        let fish5 = PIXI.Sprite.from(assetUrls[6]); // Fifth fish 
+        fish5.scale.set(0.15);
+        fish5.anchor.set(0.25);
+        fish5.x = 575;
+        fish5.y = 375;
+
+
+        // Fish container 
+        let fishContainer = new PIXI.Container();
+        fishContainer.addChild(fish1);
+        fishContainer.addChild(fish2);
+        fishContainer.addChild(fish3);
+        fishContainer.addChild(fish4);
+        fishContainer.addChild(fish5);
+        app.stage.addChild(fishContainer);
+
+        // Plants
+        let plant1 = PIXI.Sprite.from(assetUrls[4]);
+        plant1.scale.set(0.25);
+        plant1.x = -50;
+        plant1.y = 300;
+
+        let plant2 = PIXI.Sprite.from(assetUrls[4]);
+        plant2.scale.set(0.25);
+        plant2.x = 65;
+        plant2.y = 400;
+
+        let plant3 = PIXI.Sprite.from(assetUrls[4]); //5th
+        plant3.scale.set(0.20);
+        plant3.x = 450;
+        plant3.y = 400;
+
+        let plant4 = PIXI.Sprite.from(assetUrls[4]);
+        plant4.scale.set(0.30);
+        plant4.x = 575;
+        plant4.y = 375;
+
+        let plant5 = PIXI.Sprite.from(assetUrls[4]);
+        plant5.scale.set(0.20);
+        plant5.x = 275;
+        plant5.y = 450;
+
+        app.stage.addChild(plant1);
+        app.stage.addChild(plant2);
+        app.stage.addChild(plant3);
+        app.stage.addChild(plant4);
+        app.stage.addChild(plant5);
+
+        // Bubbles container
+        let bubbles = [];
+        for (let i = 0; i < 10; i++) {
+            const bubble = PIXI.Sprite.from(assetUrls[5]);
+            bubble.scale.set(0.1);
+            bubble.anchor.set(0.5);
+            bubble.x = Math.random() * app.renderer.width;
+            bubble.y = app.renderer.height - Math.random() * 220;
+            app.stage.addChild(bubble);
+            bubbles.push(bubble);
+        }
+
+        // Counter for animation
+        let counter = 0;
+
+        // Animation loop!
+        function loop() {
+            counter++;
+
+            // Fish 1 Animation (swim) 
+            fish1.y = (Math.sin(counter / 50) * 40) + 375;
+            fish1.scale.x = (Math.sin(counter / 4) * .005) + -.24;
+
+            // Fish 2 Animation (tint and swim)
+            fish2.tint = 0xFFFFFF * (Math.abs(Math.sin(counter / 50)));
+
+            // Fish 2 Swim (left and right)
+            fish2.x = 150 + Math.sin(counter / 30) * 10;
+
+
+            // Fish 3 Animation (up and down)
+            fish3.y = 220 + Math.sin(counter / 20) * 20;
+            fish3.scale.x = (Math.sin(counter / 4) * .005) + .25;
+
+            // Fish 4 Animation (up and down)
+            fish4.y = 100 + Math.sin(counter / 20) * 10;
+
+            // Fish 5 Animation (swim) 
+            fish5.y = (Math.sin(counter / 40) * 20) + 370;
+            fish5.scale.x = (Math.sin(counter / 4) * .003) + .2;
+
+
+            // Bubble Animation
+            bubbles.forEach(bubble => {
+                bubble.y -= 1;
+                if (bubble.y < 0) {
+                    bubble.y = app.renderer.height;
+                    bubble.x = Math.random() * app.renderer.width;
+                }
+            });
+
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        // Make a Button Class
+        class Button extends PIXI.Container {
+
+            //Constructor
+            constructor(text, w = 80, h = 50) {
+                super();
+
+                if (text === undefined) text = "Button";
+                if (w === undefined) w = 80;
+                if (h === undefined) h = 50;
+
+                //Button body
+                let body = new PIXI.Graphics();
+                body.beginFill(0x3EB489);
+                body.drawRect(0, 0, w, h);
+                body.endFill();
+                this.addChild(body);
+                this.body = body;
+
+                //Button label
+                let label = new PIXI.Text(text, { fontSize: 18 });
+                label.anchor.set(0.5);
+                label.x = body.width / 2;
+                label.y = body.height / 2;
+                this.addChild(label);
+
+                //Make it interactive
+                this.interactive = true;
+            }
+        }
+
+        // Button to randomly change Fish 3's color
+        let colorChangeButton = new Button("Change Fish Color", 180, 50);
+        colorChangeButton.x = 580;
+        colorChangeButton.y = 40;
+
+        // Change Fish 3's color on click
+        colorChangeButton.on('pointerdown', () => {
+            fish3.tint = Math.random() * 0xFFFFFF;
+        });
+
+        app.stage.addChild(colorChangeButton);
+
+        // Make Fish 1 draggable
+        fish1.interactive = true;
+        fish1.buttonMode = true;
+
+        fish1.on('pointerdown', onDragStart)
+            .on('pointerup', onDragEnd)
+            .on('pointerupoutside', onDragEnd)
+            .on('pointermove', onDragMove);
+
+        function onDragStart(event) {
+            this.data = event.data;
+            this.dragging = true;
+        }
+
+        function onDragEnd() {
+            this.dragging = false;
+            this.data = null;
+        }
+
+        function onDragMove() {
+            if (this.dragging) {
+                const newPosition = this.data.getLocalPosition(this.parent);
+                this.x = newPosition.x;
+                this.y = newPosition.y;
+            }
+        }
+
+
+        // Make Fish 4 draggable
+        fish4.interactive = true;
+        fish4.buttonMode = true;
+
+        fish4.on('pointerdown', onDragStart)
+            .on('pointerup', onDragEnd)
+            .on('pointerupoutside', onDragEnd)
+            .on('pointermove', onDragMove);
+
+
+
+    </script>
+</body>
+
 </html>
