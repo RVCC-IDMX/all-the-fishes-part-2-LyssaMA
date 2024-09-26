@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All the Fishes</title>
+    <script src="https://pixijs.download/release/pixi.js"></script>
+</head>
+
+<body>
+
+    <script type="module">
+
+        //The App
+        const app = new PIXI.Application();
+        await app.init({
+            width: 640,
+            height: 480,
+            backgroundColor: 0x000000
+        });
+
+        //Add view to the body
+        document.body.appendChild(app.canvas);
+
+        //Expose the app to the document
+        window.app = app;
+
+        // Load assets
+        const assetUrls = [
+            "img/Red Fish.png",                   // Fish 4
+        ];
+
+        await Promise.all(assetUrls.map(url => PIXI.Assets.load(url)));
+
+        // Add our first fish sprite
+        let fish1 = PIXI.Sprite.from("img/Red Fish.png");
+        fish1.scale.set(0.15);
+        fish1.scale.x = -0.1;
+        fish1.anchor.set(0.2, 0.4);
+        fish1.x = 100;
+        fish1.y = 100;
+
+        app.stage.addChild(fish1);
+
+        //The Animator
+        let Animate = {};
+
+        Animate.to = function (obj, end) {
+
+            //Make it a Promise
+            return new Promise((resolve, reject) => {
+
+                //Set initial state
+                var start = {
+                    x: obj.x,
+                    y: obj.y
+                };
+
+                //Defaults here 
+                if (end.duration == undefined) end.duration = 0;
+                if (end.easing == undefined) end.easing = Animate.linear;
+
+                //When did we start animating?
+                var startTime = Date.now();
+
+                //Our animation loop
+                function loop() {
+                    //Calculate where we are
+                    let ticker = Date.now() - startTime;
+                    let delta = ticker / end.duration;
+                    let ease = end.easing(delta);
+
+                    //Are we done?
+                    if (delta >= 1 || end.duration == 0) {
+                        obj.x = end.x;
+                        obj.y = end.y;
+                        console.log("Done!");
+                        resolve();
+                        return;
+                    }
+
+                    //Interpolation function
+                    let lerp = (a, b, n) => {
+                        return (1 - n) * a + n * b;
+                    }
+
+                    //Lerp X
+                    obj.x = lerp(start.x, end.x, ease);
+
+                    //Lerp Y
+                    obj.y = lerp(start.y, end.y, ease);
+
+                    //Loop again
+                    obj.animationID = requestAnimationFrame(loop);
+
+                }
+
+                //Stop animation
+                cancelAnimationFrame(obj.animationID);
+
+                //Call it
+                loop();
+
+                //End Promise
+
+            });
+
+        }
+
+            //Stop animating!
+            Animate.stop = function (obj) {
+                //Stop animation
+                cancelAnimationFrame(obj.animationID);
+            }
+
+        //Easing functions
+        Animate.linear = (x) => x;
+        Animate.easeIn = (x) => x * x;
+        Animate.easeOut = (x) => 1 - (1 - x) * (1 - x);
+
+        await Animate.to(fish1, {
+            x: 200,
+            y: 200,
+            easing: Animate.easeIn,
+            duartion: 1000
+        })
+
+        await Animate.to(fish1, {
+            x: 400,
+            y: 400,
+            easing: Animate.easeOut,
+            duration: 2000 //1 second
+        })
+        /*
+                Animate.to(fish1, {
+                    x: 0,
+                    y: 500,
+                    duration: 10000 //1 second
+                });
+        */
+
+
+    </script>
+</body>
+
+</html>
